@@ -51,9 +51,11 @@ class Path:
 
                 if CreateIfNoExists:
 
-                    if isfile(directory):
+                    if isfile(directory) or directory.find( '.' ):
 
-                        Path.m_Logger.warn( "Can NOT <c>CreateIfNoExists<> \"<g>{}<>\" is not a folder!", directory );
+                        if SupressWarning is False:
+
+                            Path.m_Logger.warn( "Can NOT <c>CreateIfNoExists<> \"<g>{}<>\" is not a folder!", directory );
 
                     else:
 
