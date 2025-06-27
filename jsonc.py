@@ -18,7 +18,14 @@ class jsonc( dict ):
             from utils.fmt import fmt;
             from json import loads;
 
-            super().__init__( loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) ) );
+            json = {};
+            
+            try:
+                json= loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
+            except Exception as e:
+                self.m_Logger.info( "Couldn't deserialize file <g>{}<> Generated empty.", e );
+
+            super().__init__( json );
 
         elif exists_ok:
 
