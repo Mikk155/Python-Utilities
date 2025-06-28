@@ -56,6 +56,23 @@ def LoggerClearLevel( level: LoggerLevel ):
     if GlobalLoggerLevel & level:
         GlobalLoggerLevel &= level;
 
+def ToLoggerLevel( level: str ) -> int:
+    if level == 'Critical':
+        return LoggerLevel.Critical;
+    if level == 'Error':
+        return LoggerLevel.Error;
+    if level == 'Warning':
+        return LoggerLevel.Warning;
+    if level == 'Information':
+        return LoggerLevel.Information;
+    if level == 'Debug':
+        return LoggerLevel.Debug;
+    if level == 'Trace':
+        return LoggerLevel.Trace;
+    if level == 'AllLoggers':
+        return LoggerLevel.AllLoggers;
+    return 0;
+
 class Logger():
 
     name: str;
