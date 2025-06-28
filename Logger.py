@@ -154,7 +154,7 @@ class Logger():
         self.log( "warning", self.c.YELLOW, message, LoggerLevel.Warning, *args );
 
     def trace( self, message: str, *args ):
-        self.log( "trace", self.c.YELLOW, message, LoggerLevel.Trace, *args );
+        self.log( "trace", self.c.BLUE, message, LoggerLevel.Trace, *args );
 
     def error( self, message: str, *args, Exit:bool = False ):
         self.log( "error", self.c.RED, message, LoggerLevel.Error, *args );
