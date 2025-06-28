@@ -26,6 +26,7 @@ class fmt:
 
         return string;
 
+    @staticmethod
     def DiscordUserMention( user ) -> str:
         
         '''
@@ -40,3 +41,61 @@ class fmt:
             return f"<@{user}>";
 
         return f"<@{user.id}>";
+
+    @staticmethod
+    def FormatSourcesWithLicence( licence: str, *, sources_folder: str = None, files: list[str] = None ) -> None:
+        '''
+            Formats all .py files including the licence on the header
+
+            `licence`: absolute path to a file. if fails to open then this assumes the licence string itself is a container.
+
+            `sources_folder`: Folder to inspect for .py files to update.
+
+            `files`: List of absolute path to files. `sources_folder` will add items here so have that value set to None.
+        '''
+
+        from os import walk;
+        from os.path import exists;
+
+        if exists( licence ):
+
+            licence = open( licence, "r" ).read();
+
+        if sources_folder is not None:
+
+            if not exists( sources_folder ):
+
+                fmt.m_Logger.error( "Folder \"<g>{}<>\" does not exists!", sources_folder );
+
+                return;
+
+            for root, _, DirectoryFiles in walk( sources_folder ):
+
+                ValidFiles = [ file for file in DirectoryFiles if file.endswith( ".py" ) ];
+
+                files += ValidFiles;
+
+        Triple = "'''";
+
+        if licence.endswith( '\n' ):
+            licence = licence[ : -2 ];
+
+        for file in files:
+
+            if exists( file ):
+
+                fileIO = open( file, 'r' ).read();
+
+                if fileIO.startswith( Triple ):
+
+                    fileIO = fileIO[ fileIO.find( Triple, 3 ) + 3 : ];
+                
+                    while fileIO.startswith( '\n' ):
+
+                        fileIO = fileIO[ 1 : ];
+
+                open( file, 'w' ).write( f'{Triple}\n{licence}\n{Triple}\n\n{fileIO}' );
+
+            else:
+
+                fmt.m_Logger.warn( "file \"<g>{}<>\" does not exists!", file );
