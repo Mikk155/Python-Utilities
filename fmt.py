@@ -22,9 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
 '''
 
+from utils.Logger import Logger;
+from datetime import datetime, timedelta;
+
 class fmt:
 
-    from utils.Logger import Logger;
     m_Logger = Logger( "Formater" );
 
     @staticmethod
@@ -156,3 +158,18 @@ class fmt:
                 app_commands_choices.append( app_commands.Choice( name=k, value=v ) );
 
         return app_commands_choices;
+
+    @staticmethod
+    def TimeDelta( delta: timedelta ) -> tuple[int, int, int]:
+
+        '''
+            Return a tuple with the timedelta in seconds, minutes and hours
+        '''
+
+        TimeStampSeconds = int( timedelta.total_seconds() );
+
+        return (
+            int( TimeStampSeconds % 60 ),
+            int( ( TimeStampSeconds % 3600) // 60 ),
+            int( TimeStampSeconds // 3600 )
+        );
