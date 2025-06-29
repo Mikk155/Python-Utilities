@@ -104,7 +104,7 @@ class Logger():
 
     from colorama import Fore as c;
 
-    def log( self, levelname: str, color: str, message: str, level: LoggerLevel, *args ) -> str:
+    def log( self, levelname: str, color: str, message: str, level: LoggerLevel, *args, name: str = None ) -> str:
 
         if level != LoggerLevel.Critical or level != LoggerLevel.Error:
 
@@ -129,7 +129,7 @@ class Logger():
             Logger.c.YELLOW, now.minute, Logger.c.RESET,
             Logger.c.YELLOW, now.second, Logger.c.RESET,
             color, levelname, Logger.c.RESET, Logger.c.CYAN,
-            self.name, Logger.c.RESET, message
+            self.name if name is None else name, Logger.c.RESET, message
         );
 
         ColorList = {
@@ -161,24 +161,24 @@ class Logger():
 
         print( message );
 
-    def debug( self, message: str, *args ):
-        self.log( "debug", self.c.CYAN, message, LoggerLevel.Debug, *args );
+    def debug( self, message: str, *args, name: str = None ):
+        self.log( "debug", self.c.CYAN, message, LoggerLevel.Debug, *args, name=name );
 
-    def info( self, message: str, *args ):
-        self.log( "info", self.c.GREEN, message, LoggerLevel.Information, *args );
+    def info( self, message: str, *args, name: str = None ):
+        self.log( "info", self.c.GREEN, message, LoggerLevel.Information, *args, name=name );
 
-    def warn( self, message: str, *args ):
-        self.log( "warning", self.c.YELLOW, message, LoggerLevel.Warning, *args );
+    def warn( self, message: str, *args, name: str = None ):
+        self.log( "warning", self.c.YELLOW, message, LoggerLevel.Warning, *args, name=name );
 
-    def trace( self, message: str, *args ):
-        self.log( "trace", self.c.BLUE, message, LoggerLevel.Trace, *args );
+    def trace( self, message: str, *args, name: str = None ):
+        self.log( "trace", self.c.BLUE, message, LoggerLevel.Trace, *args, name=name );
 
-    def error( self, message: str, *args, Exit:bool = False ):
-        self.log( "error", self.c.RED, message, LoggerLevel.Error, *args );
+    def error( self, message: str, *args, Exit:bool = False, name: str = None ):
+        self.log( "error", self.c.RED, message, LoggerLevel.Error, *args, name=name );
         if Exit:
             exit(1);
 
-    def critical( self, message: str, *args, Exit:bool = False ):
-        self.log( "error", self.c.RED, message, LoggerLevel.Critical, *args );
+    def critical( self, message: str, *args, Exit:bool = False, name: str = None ):
+        self.log( "error", self.c.RED, message, LoggerLevel.Critical, *args, name=name );
         if Exit:
             exit(1);
