@@ -123,3 +123,36 @@ class fmt:
             else:
 
                 fmt.m_Logger.warn( "file \"<g>{}<>\" does not exists!", file );
+
+    @staticmethod
+    def DiscordCommandsChoices( obj: dict[str, str] | list[str] ) -> list:
+
+        '''
+        Converts a dictionary to a list of app_commands.Choice
+        '''
+
+        from discord import app_commands
+
+        icount = 0;
+
+        app_commands_choices = [];
+
+        for k, v in obj.items() if isinstance( obj, dict ) else enumerate( obj ):
+
+            if icount >= 25:
+
+                fmt.m_Logger.warn( "Size is above discord limit of 25 items!" );
+
+                break;
+
+            icount += 1;
+
+            if isinstance( k, int ):
+
+                app_commands_choices.append( app_commands.Choice( name=v, value=str(k) ) );
+
+            else:
+
+                app_commands_choices.append( app_commands.Choice( name=k, value=v ) );
+
+        return app_commands_choices;
