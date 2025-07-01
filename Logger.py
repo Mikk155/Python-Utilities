@@ -181,6 +181,6 @@ class Logger():
             exit(1);
 
     def critical( self, message: str, *args, Exit:bool = False, name: str = None ):
-        self.log( "error", self.c.RED, message, LoggerLevel.Critical, *args, name=name );
+        self.log( "critical", self.c.RED, message, LoggerLevel.Critical, *args, name=name );
         if Exit:
             exit(1);
