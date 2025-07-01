@@ -163,24 +163,28 @@ class Logger():
 
         return message;
 
-    def debug( self, message: str, *args, name: str = None ):
-        self.log( "debug", self.c.CYAN, message, LoggerLevel.Debug, *args, name=name );
+    def debug( self, message: str, *args, name: str = None ) -> str:
+        return self.log( "debug", self.c.CYAN, message, LoggerLevel.Debug, *args, name=name );
 
-    def info( self, message: str, *args, name: str = None ):
-        self.log( "info", self.c.GREEN, message, LoggerLevel.Information, *args, name=name );
+    def info( self, message: str, *args, name: str = None ) -> str:
+        return self.log( "info", self.c.GREEN, message, LoggerLevel.Information, *args, name=name );
 
-    def warn( self, message: str, *args, name: str = None ):
-        self.log( "warning", self.c.YELLOW, message, LoggerLevel.Warning, *args, name=name );
+    def warn( self, message: str, *args, name: str = None ) -> str:
+        return self.log( "warning", self.c.YELLOW, message, LoggerLevel.Warning, *args, name=name );
 
-    def trace( self, message: str, *args, name: str = None ):
-        self.log( "trace", self.c.BLUE, message, LoggerLevel.Trace, *args, name=name );
+    def trace( self, message: str, *args, name: str = None ) -> str:
+        return self.log( "trace", self.c.BLUE, message, LoggerLevel.Trace, *args, name=name );
 
-    def error( self, message: str, *args, Exit:bool = False, name: str = None ):
-        self.log( "error", self.c.RED, message, LoggerLevel.Error, *args, name=name );
+    def error( self, message: str, *args, Exit:bool = False, name: str = None ) -> str:
+        s = self.log( "error", self.c.RED, message, LoggerLevel.Error, *args, name=name );
         if Exit:
             exit(1);
+        else:
+            return s;
 
-    def critical( self, message: str, *args, Exit:bool = False, name: str = None ):
-        self.log( "critical", self.c.RED, message, LoggerLevel.Critical, *args, name=name );
+    def critical( self, message: str, *args, Exit:bool = False, name: str = None ) -> str:
+        s = self.log( "critical", self.c.RED, message, LoggerLevel.Critical, *args, name=name );
         if Exit:
             exit(1);
+        else:
+            return s;
