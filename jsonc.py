@@ -45,9 +45,9 @@ class jsonc( dict ):
             json = {};
             
             try:
-                json= loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
+                json = loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
             except Exception as e:
-                self.m_Logger.info( "Couldn't deserialize file <g>{}<> Generated empty.", e );
+                self.m_Logger.error( "Couldn't deserialize file <g>{}<> Generated empty.", e );
 
             super().__init__( json );
 
@@ -55,7 +55,7 @@ class jsonc( dict ):
 
             open( file_path, 'w' ).write( "{ }" );
 
-            self.m_Logger.info( "Couldn't open file <g>{}<> Generated.", file_path );
+            self.m_Logger.error( "Couldn't open file <g>{}<> Generated.", file_path );
 
             super().__init__( {} );
 
