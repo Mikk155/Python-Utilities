@@ -12,5 +12,6 @@ class RGB:
     def __repr__( self ):
         return "#{:02x}{:02x}{:02x}".format( self.R, self.G, self.B )
 
-    def int( self ) -> int:
+    @property
+    def hex( self ) -> int:
         return ( self.R << 16 ) | ( self.G << 8 ) | self.B;
