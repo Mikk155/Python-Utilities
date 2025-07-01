@@ -106,17 +106,6 @@ class Logger():
 
     def log( self, levelname: str, color: str, message: str, level: LoggerLevel, *args, name: str = None ) -> str:
 
-        if level != LoggerLevel.Critical or level != LoggerLevel.Error:
-
-            LevelsCheck = ( GlobalLoggerLevel, self.level );
-
-            for LevelCheck in LevelsCheck:
-
-                if LevelCheck != LoggerLevel.AllLoggers:
-
-                    if not LevelCheck & level:
-                        return;
-
         from datetime import datetime;
 
         now = datetime.now();
@@ -159,7 +148,20 @@ class Logger():
                     message = message.replace( f'<{p}>', v, 1 );
                     message = message.replace( f'<>', Logger.c.RESET, 1 );
 
+        if level != LoggerLevel.Critical or level != LoggerLevel.Error:
+
+            LevelsCheck = ( GlobalLoggerLevel, self.level );
+
+            for LevelCheck in LevelsCheck:
+
+                if LevelCheck != LoggerLevel.AllLoggers:
+
+                    if not LevelCheck & level:
+                        return message;
+
         print( message );
+
+        return message;
 
     def debug( self, message: str, *args, name: str = None ):
         self.log( "debug", self.c.CYAN, message, LoggerLevel.Debug, *args, name=name );
