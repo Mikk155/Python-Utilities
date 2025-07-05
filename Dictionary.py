@@ -11,15 +11,8 @@ class Dictionary:
         self.__dict__[ "_parent" ] = parent
         self.__dict__[ "_key" ] = key
 
-    def IsPrivate( self, name: str ) -> bool:
-        return ( name in ( '_data', '_parent', '_key' ) );
-
     def __getattr__( self, name ) -> "Dictionary":
 
-        if self.IsPrivate( name ):
-        #
-            raise AttributeError(f"Access to {name} not allowed" );
-        #
         if name not in self._data:
         #
             self._data[ name ] = Dictionary( self, name );
@@ -28,11 +21,7 @@ class Dictionary:
 
     def __setattr__(self, name, value) -> None:
 
-        if self.IsPrivate( name ):
-        #
-            raise AttributeError(f"Access to {name} not allowed" );
-        #
-        elif isinstance(value, dict):
+        if isinstance(value, dict):
         #
             node = Dictionary(self, name)
             node._data = {k: self._wrap_value(k, v) for k, v in value.items()}
@@ -59,20 +48,21 @@ class Dictionary:
         #
         return value
 
-    def serialize( self, value ) -> dict:
-        if isinstance( value, Dictionary ):
+    @staticmethod
+    def Serialize( d: "Dictionary" ) -> dict:
+        if isinstance( d, Dictionary ):
         #
-            return value.ToDict;
+            return Dictionary.ToDict(d);
         #
-        return value
+        return d
 
-    @property
-    def ToDict( self ) -> dict:
+    @staticmethod
+    def ToDict( d: "Dictionary" ) -> dict:
         '''Return a dict object'''
-        return { k: self.Serialize(v) for k, v in self._data.items() }
+        return { k: Dictionary.Serialize(v) for k, v in d._data.items() }
 
-    @property
-    def ToJson( self ) -> str:
+    @staticmethod
+    def ToJson( d: "Dictionary" ) -> str:
         '''Return a json serialized string'''
         from json import dumps;
-        return dumps( self.ToDict, indent=4 );
+        return dumps( Dictionary.ToDict( d ), indent=4 );
