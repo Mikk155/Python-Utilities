@@ -27,7 +27,13 @@ class jsonc( dict ):
     from utils.Logger import Logger;
     m_Logger = Logger( "Json Commentary" );
 
-    def __init__( self, file_path: str, *, exists_ok=None ) -> dict | list:
+    def __init__(
+        self,
+        file_path: str,
+        *,
+        exists_ok: bool = False,
+        schema_validation: str | dict = None
+    ) -> dict | list:
 
         """
             Deserialize file into a json dict or list based on the absolute path ``file_path``
@@ -37,34 +43,63 @@ class jsonc( dict ):
 
         from os.path import exists;
 
-        if exists( file_path ):
+        json = {};
 
+        if exists( file_path ):
+        #
             from utils.fmt import fmt;
             from json import loads;
 
-            json = {};
-            
             try:
-                json = loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
+            #
+                json: list | dict = loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
+            #
             except Exception as e:
+            #
                 self.m_Logger.error( "Couldn't deserialize file <g>{}<> Generated empty.", e );
-
-            super().__init__( json );
-
-        elif exists_ok:
-
+            #
+        #
+        elif exists_ok is True:
+        #
             open( file_path, 'w' ).write( "{ }" );
-
             self.m_Logger.error( "Couldn't open file <g>{}<> Generated.", file_path );
-
-            super().__init__( {} );
-
-            return;
-
+        #
         else:
-
+        #
             self.m_Logger.error( "Couldn't open file <g>{}<>", file_path );
-
             raise FileNotFoundError( f"Couldn't open file \"{file_path}\"" )
+        #
 
-        super().__init__( {} );
+        super().__init__( json );
+
+        if schema_validation is not None:
+        #
+            self.SchemaValidate( schema_validation );
+        #
+
+    def SchemaValidate( self, schema: dict | str ) -> None:
+        '''
+            Validates a schema
+        '''
+
+        from jsonschema import Draft7Validator, ValidationError # type: ignore
+
+        if isinstance( schema, str ):
+        #
+            schema = jsonc( schema );
+        #
+
+        Validator = Draft7Validator(schema)
+
+        Errors: list = list( Validator.iter_errors(self) );
+
+        if Errors:
+        #
+            raise ValidationError( "\n".join( f"{e.message} at {list(e.path)}" for e in Errors ) );
+        #
+
+        if schema.get( "type ") == "object" and not schema.get( "additionalProperties", True ):
+        #
+            AllowedKeys = set( schema.get("properties", {}).keys() );
+            self.pop( k for k, v in self.items() if k not in AllowedKeys );
+        #
