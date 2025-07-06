@@ -136,6 +136,8 @@ class Dictionary:
 
     def __setitem__( self, name, value ) -> None:
     #
+        assert not isinstance( name, str ), "Key names must be only str!";
+
         if isinstance( value, dict ):
         #
             _Dictionary = Dictionary( parent=self, key=name );
