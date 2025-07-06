@@ -46,7 +46,7 @@ class fmt:
 
         if string.find( "//" ) != -1:
 
-            Items = [ line for line in string.split( '\n' ) if not line.strip( ' ' ).startswith( '//' ) ];
+            Items: list[str] = [ line for line in string.split( '\n' ) if not line.strip( ' ' ).startswith( '//' ) ];
 
             string = ''.join( f'{i}\n' for i in Items );
 
@@ -54,7 +54,7 @@ class fmt:
 
     @staticmethod
     def DiscordUserMention( user ) -> str:
-        
+
         '''
             Return a fixed ``discord.Member.mention`` string for globalization\n
             since a leading characters are added when the user has a custom nickname
@@ -110,17 +110,23 @@ class fmt:
 
             if exists( file ):
 
-                fileIO = open( file, 'r' ).read();
+                try:
 
-                if fileIO.startswith( Triple ):
+                    fileIO: str = open( file, 'r' ).read();
 
-                    fileIO = fileIO[ fileIO.find( Triple, 3 ) + 3 : ];
-                
-                    while fileIO.startswith( '\n' ):
+                    if fileIO.startswith( Triple ):
 
-                        fileIO = fileIO[ 1 : ];
+                        fileIO = fileIO[ fileIO.find( Triple, 3 ) + 3 : ];
 
-                open( file, 'w' ).write( f'{Triple}\n{licence}\n{Triple}\n\n{fileIO}' );
+                        while fileIO.startswith( '\n' ):
+
+                            fileIO = fileIO[ 1 : ];
+
+                    open( file, 'w' ).write( f'{Triple}\n{licence}\n{Triple}\n\n{fileIO}' );
+
+                except Exception as e:
+
+                    fmt.m_Logger.warn( "Exception: \"<g>{}<>\" for \"<c>{}<>\"", e, file );
 
             else:
 
