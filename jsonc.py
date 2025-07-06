@@ -22,9 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
 '''
 
+from utils.Logger import Logger;
+
 class jsonc( dict ):
 
-    from utils.Logger import Logger;
     m_Logger = Logger( "Json Commentary" );
 
     def __init__(
