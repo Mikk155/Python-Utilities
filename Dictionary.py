@@ -268,3 +268,17 @@ class Dictionary:
         #
         return None;
     #
+
+    @classmethod
+    def FromDict( cls, data: dict, *, fnCallback=None, parent=None, key=None ) -> "Dictionary":
+    #
+        '''Create a Dictionary by a given dict'''
+
+        obj = cls( fnCallback=fnCallback, parent=parent, key=key )
+
+        for k, v in data.items():
+        #
+            obj._data[k] = obj._wrap_value(k, v)
+        #
+        return obj
+    #
