@@ -69,7 +69,7 @@ class fmt:
         return f"<@{user.id}>";
 
     @staticmethod
-    def FormatSourcesWithLicence( licence: str, *, sources_folder: str = None, files: list[str] = [] ) -> None:
+    def FormatSourcesWithLicence( licence: str, *, sources_folder: str = None, files: list[str] = None ) -> None:
         '''
             Formats all .py files including the licence on the header
 
@@ -79,6 +79,9 @@ class fmt:
 
             `files`: List of absolute path to files. `sources_folder` will add items here so have that value set to None.
         '''
+
+        if files is None:
+            files = [];
 
         from os import walk;
         from os.path import exists, join;
