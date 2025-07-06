@@ -182,6 +182,15 @@ class Dictionary:
         return self.ToJson( None );
     #
 
+    def pop( self, name: str ) -> None:
+    #
+        if name in self._data:
+        #
+            self._data.pop( name );
+            self.__TryCallback__;
+        #
+    #
+
     def ToJson( self, indent: int = None ) -> str:
     #
         '''Return a json serialized string'''
