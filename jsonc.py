@@ -73,6 +73,8 @@ class jsonc( dict ):
 
         super().__init__( json );
 
+        self.pop( "$schema", "" );
+
         if schema_validation is not None:
         #
             self.SchemaValidate( schema_validation );
@@ -83,7 +85,7 @@ class jsonc( dict ):
             Validates a schema
         '''
 
-        from jsonschema import Draft7Validator, ValidationError # type: ignore
+        from jsonschema import Draft7Validator, ValidationError;
 
         if isinstance( schema, str ):
         #
