@@ -134,6 +134,11 @@ class Dictionary:
         return self._data[ name ];
     #
 
+    def __contains__( self, name ) -> bool:
+    #
+        return ( name in self._data );
+    #
+
     def __setitem__( self, name, value ) -> None:
     #
         if isinstance( name, int | float ):
