@@ -125,6 +125,11 @@ class Dictionary:
 
     def __getitem__( self, name ) -> "Dictionary":
     #
+        if isinstance( name, int | float ):
+            name = str(name);
+
+        assert isinstance( name, str ), "Key names must be only str!";
+
         if name not in self._data:
         #
             _Dictionary = Dictionary( parent=self, key=name );
@@ -136,6 +141,11 @@ class Dictionary:
 
     def __contains__( self, name ) -> bool:
     #
+        if isinstance( name, int | float ):
+            name = str(name);
+
+        assert isinstance( name, str ), "Key names must be only str!";
+
         return ( name in self._data );
     #
 
@@ -166,6 +176,11 @@ class Dictionary:
 
     def _wrap_value( self, key, value ):
     #
+        if isinstance( key, int | float ):
+            key = str(key);
+
+        assert isinstance( key, str ), "Key names must be only str!";
+
         if isinstance( value, dict ):
         #
             _Dictionary = Dictionary( parent=self, key=key );
@@ -192,6 +207,11 @@ class Dictionary:
 
     def pop( self, name: str ) -> None:
     #
+        if isinstance( name, int | float ):
+            name = str(name);
+
+        assert isinstance( name, str ), "Key names must be only str!";
+
         if name in self._data:
         #
             self._data.pop( name );
