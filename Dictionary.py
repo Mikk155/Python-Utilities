@@ -219,6 +219,10 @@ class Dictionary:
         #
     #
 
+    def items( self ):
+        return self._data.items();
+    #
+
     def ToJson( self, indent: int = None ) -> str:
     #
         '''Return a json serialized string'''
