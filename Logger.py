@@ -148,8 +148,9 @@ class Logger():
                     message = message.replace( f'<{p}>', v, 1 );
                     message = message.replace( f'<>', Logger.c.RESET, 1 );
 
-        if level != LoggerLevel.Critical or level != LoggerLevel.Error:
+        if level != LoggerLevel.Critical and level != LoggerLevel.Error:
 
+            global GlobalLoggerLevel;
             LevelsCheck = ( GlobalLoggerLevel, self.level );
 
             for LevelCheck in LevelsCheck:
