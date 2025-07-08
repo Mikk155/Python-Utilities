@@ -44,11 +44,18 @@ class fmt:
 
                 string = string[ : index_open ] + string[ string.find( '*/' ) + 2 : ];
 
-        if string.find( "//" ) != -1:
+        CommentaryIndex: int = 0;
 
-            Items: list[str] = [ line for line in string.split( '\n' ) if not line.strip( ' ' ).startswith( '//' ) ];
+        while CommentaryIndex != -1:
 
-            string = ''.join( f'{i}\n' for i in Items );
+            CommentaryIndex = string.find( "//" );
+
+            if CommentaryIndex == -1:
+                break;
+
+            StringCopy: str = string[ : CommentaryIndex ] + string[ string.find( '\n', CommentaryIndex ) : ];
+
+            string = StringCopy;
 
         return string;
 
