@@ -30,36 +30,6 @@ class fmt:
     m_Logger = Logger( "Formater" );
 
     @staticmethod
-    def PurgeCommentary( string: str ) -> str:
-
-        '''
-            Purge commentaries from a string
-        '''
-
-        while string.find( '/*' ) != -1:
-
-            index_open = string.find( '/*' );
-
-            if index_open != -1:
-
-                string = string[ : index_open ] + string[ string.find( '*/' ) + 2 : ];
-
-        CommentaryIndex: int = 0;
-
-        while CommentaryIndex != -1:
-
-            CommentaryIndex = string.find( "//" );
-
-            if CommentaryIndex == -1:
-                break;
-
-            StringCopy: str = string[ : CommentaryIndex ] + string[ string.find( '\n', CommentaryIndex ) : ];
-
-            string = StringCopy;
-
-        return string;
-
-    @staticmethod
     def DiscordUserMention( user ) -> str:
 
         '''

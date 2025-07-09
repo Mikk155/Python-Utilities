@@ -28,12 +28,72 @@ class jsonc( dict ):
 
     m_Logger = Logger( "Json Commentary" );
 
+    @staticmethod
+    def PurgeCommentary( string: str ) -> str:
+
+        '''
+            Purge commentaries from a string
+        '''
+
+        FormattedString = '';
+
+        InPair = False;
+        InSingleCommentary = False;
+        InMultiCommentary = False;
+        SkipNextChar = False;
+
+        for index, char in enumerate(string):
+
+            if SkipNextChar is True:
+                SkipNextChar = False;
+                continue;
+
+            if InPair is True:
+
+                if char == '\"' and string[index - 1 ] != '\\':
+                    InPair = False;
+
+            elif InSingleCommentary is True:
+
+                if char == '\n' or ( char == '\\' and string[index + 1 ] == 'n' ):
+                    InSingleCommentary = False;
+                    SkipNextChar = True;
+                continue;
+
+            elif InMultiCommentary is True:
+
+                if char == '*' and string[index + 1 ] == '/':
+                    InMultiCommentary = False;
+                    SkipNextChar = True;
+                continue;
+
+            elif char == '/' and string[index + 1 ] == '/':
+                InSingleCommentary = True;
+                SkipNextChar = True;
+                continue;
+
+            elif char == '/' and string[index + 1 ] == '*':
+                InMultiCommentary = True;
+                SkipNextChar = True;
+                continue;
+
+            elif char == '\"' and string[index - 1 ] != '\\':
+                InPair = True;
+
+            elif char == ' ':
+                continue;
+
+            FormattedString += char;
+
+        return FormattedString;
+
     def __init__(
         self,
         file_path: str,
         *,
         exists_ok: bool = False,
-        schema_validation: str | dict = None
+        schema_validation: str | dict = None,
+        sensitive: bool = None
     ) -> dict | list:
 
         """
@@ -53,11 +113,16 @@ class jsonc( dict ):
 
             try:
             #
-                json: list | dict = loads( fmt.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
+                json: list | dict = loads( jsonc.PurgeCommentary( open( file = file_path, mode = 'r' ).read() ) );
             #
             except Exception as e:
             #
-                self.m_Logger.error( "Couldn't deserialize file <g>{}<> Generated empty.", e );
+                msg: str = self.m_Logger.error( "Couldn't deserialize file <g>{}<> <r>{}<><y>:<> <r>{}<>", file_path, type(e).__name__, e );
+
+                if sensitive is True:
+                #
+                    raise Exception(msg)
+                #
             #
         #
         elif exists_ok is True:
@@ -71,25 +136,37 @@ class jsonc( dict ):
             raise FileNotFoundError( f"Couldn't open file \"{file_path}\"" )
         #
 
+        if '$schema' in json:
+        #
+            from os.path import join, dirname;
+
+            SchemaPath: str = json.pop( "$schema" );
+
+            if schema_validation is None: # Append json-defined if the code dont send a explicit one
+            #
+                schema_validation = join( dirname( file_path ), SchemaPath );
+            #
+        #
+
         super().__init__( json );
 
-        self.pop( "$schema", "" );
-
-        if schema_validation is not None:
+        if schema_validation is not None and schema_validation != -1:
         #
-            self.SchemaValidate( schema_validation );
+            self.SchemaValidate( schema_validation, sensitive=sensitive );
         #
 
-    def SchemaValidate( self, schema: dict | str ) -> None:
+    def SchemaValidate( self, schema: dict | str, sensitive: bool = None ) -> None:
         '''
             Validates a schema
         '''
+
+        self.m_Logger.info( "Start validating schema <g>{}<>", schema );
 
         from jsonschema import Draft7Validator, ValidationError;
 
         if isinstance( schema, str ):
         #
-            schema = jsonc( schema );
+            schema = jsonc( schema, schema_validation=-1 );
         #
 
         Validator = Draft7Validator(schema)
@@ -101,8 +178,8 @@ class jsonc( dict ):
             raise ValidationError( "\n".join( f"{e.message} at {list(e.path)}" for e in Errors ) );
         #
 
-        if schema.get( "type ") == "object" and not schema.get( "additionalProperties", True ):
-        #
-            AllowedKeys = set( schema.get("properties", {}).keys() );
-            self.pop( k for k, v in self.items() if k not in AllowedKeys );
-        #
+        # if schema.get( "type" ) == "object" and not schema.get( "additionalProperties", True ):
+        # #
+        #     for k, v in schema.get( "properties", {} ).items():
+        #         self.m_Logger.warn( "Invalid additional property <g>{}<>: <c>{}<>", k, self.pop( k, None ) );
+        # #
