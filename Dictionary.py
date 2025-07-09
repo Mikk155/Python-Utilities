@@ -251,6 +251,11 @@ class Dictionary:
         return len( self._data ) == 0;
     #
 
+    def __len__( self ) -> int:
+    #
+        return len( self._data );
+    #
+
     @property
     def Parent( self ) -> "Dictionary":
     #
