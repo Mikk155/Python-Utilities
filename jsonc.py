@@ -22,15 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE
 '''
 
-from utils.Logger import Logger;
-
 class jsonc( dict ):
-
-    m_Logger = Logger( "Json Commentary" );
 
     @staticmethod
     def PurgeCommentary( string: str ) -> str:
-
+    #
         '''
             Purge commentaries from a string
         '''
@@ -86,6 +82,7 @@ class jsonc( dict ):
             FormattedString += char;
 
         return FormattedString;
+    #
 
     def __init__(
         self,
@@ -93,18 +90,32 @@ class jsonc( dict ):
         *,
         exists_ok: bool = False,
         schema_validation: str | dict = None,
-        sensitive: bool = None
+        sensitive: bool = None,
+        fnoutput: object = None
     ) -> dict | list:
-
+    #
         """
-            Deserialize file into a json dict or list based on the absolute path ``file_path``
+            Deserialize a json object based on the absoulte ``file_path``
 
             ``exists_ok`` if true and the file doesn't exist we'll create it and initialize a empty dict
+
+            ``schema_validation`` absolute path to a schema json to validate this object. this could also be defined in within the json with the \"$schema\" key.
+
+            ``sensitive`` By default jsonc will return a empty dictionary if Deserialization fails. set this to True to raise a exception.
+
+            ``fnoutput`` Method to send loggin output. You can set to ``print`` to just use print()
         """
 
         from os.path import exists;
 
         json = {};
+
+        self.Output: object = fnoutput;
+
+        if self.Output is not None:
+        #
+            self.Output( f"Loading {file_path}" );
+        #
 
         if exists( file_path ):
         #
@@ -117,23 +128,30 @@ class jsonc( dict ):
             #
             except Exception as e:
             #
-                msg: str = self.m_Logger.error( "Couldn't deserialize file <g>{}<> <r>{}<><y>:<> <r>{}<>", file_path, type(e).__name__, e );
+                msg: str = f"Couldn't deserialize file \"{file_path}\" {type(e).__name__}: {e}";
 
                 if sensitive is True:
                 #
-                    raise Exception(msg)
+                    raise Exception( msg );
+                #
+                elif self.Output is not None:
+                #
+                    self.Output( msg );
                 #
             #
         #
         elif exists_ok is True:
         #
             open( file_path, 'w' ).write( "{ }" );
-            self.m_Logger.error( "Couldn't open file <g>{}<> Generated.", file_path );
+
+            if self.Output is not None:
+            #
+                self.Output( f"Couldn't open file {file_path}. Generated." );
+            #
         #
         else:
         #
-            self.m_Logger.error( "Couldn't open file <g>{}<>", file_path );
-            raise FileNotFoundError( f"Couldn't open file \"{file_path}\"" )
+            raise FileNotFoundError( f"Couldn't open file {file_path}." )
         #
 
         if '$schema' in json:
@@ -142,7 +160,7 @@ class jsonc( dict ):
 
             SchemaPath: str = json.pop( "$schema" );
 
-            if schema_validation is None: # Append json-defined if the code dont send a explicit one
+            if schema_validation is None and not SchemaPath.startswith( 'http' ):
             #
                 schema_validation = join( dirname( file_path ), SchemaPath );
             #
@@ -150,23 +168,27 @@ class jsonc( dict ):
 
         super().__init__( json );
 
-        if schema_validation is not None and schema_validation != -1:
+        if schema_validation is not None:
         #
+            if self.Output is not None:
+            #
+                self.Output( f"Validating schema..." );
+            #
             self.SchemaValidate( schema_validation, sensitive=sensitive );
         #
+    #
 
     def SchemaValidate( self, schema: dict | str, sensitive: bool = None ) -> None:
+    #
         '''
             Validates a schema
         '''
-
-        self.m_Logger.info( "Start validating schema <g>{}<>", schema );
 
         from jsonschema import Draft7Validator, ValidationError;
 
         if isinstance( schema, str ):
         #
-            schema = jsonc( schema, schema_validation=-1 );
+            schema = jsonc( schema, sensitive=sensitive, fnoutput=self.Output );
         #
 
         Validator = Draft7Validator(schema)
@@ -178,8 +200,10 @@ class jsonc( dict ):
             raise ValidationError( "\n".join( f"{e.message} at {list(e.path)}" for e in Errors ) );
         #
 
+        # -TODO Add this. if sensitive is true raise exception else just pop items
         # if schema.get( "type" ) == "object" and not schema.get( "additionalProperties", True ):
         # #
         #     for k, v in schema.get( "properties", {} ).items():
         #         self.m_Logger.warn( "Invalid additional property <g>{}<>: <c>{}<>", k, self.pop( k, None ) );
         # #
+    #
