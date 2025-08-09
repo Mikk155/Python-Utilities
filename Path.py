@@ -73,9 +73,9 @@ class Path:
 
             if not exists( directory ):
 
-                if CreateIfNoExists:
+                if CreateIfNoExists is True:
 
-                    if isfile(directory) or directory.find( '.' ):
+                    if isfile(directory) or directory.rfind( "." ) != -1:
 
                         if SupressWarning is False:
 
@@ -84,6 +84,7 @@ class Path:
                     else:
 
                         makedirs( directory, exist_ok=True );
+                        print( "==============================Makedirs " + directory )
 
                 if SupressWarning is False:
 
