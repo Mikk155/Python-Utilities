@@ -90,3 +90,89 @@ class Path:
                     Path.m_Logger.warn( "\"<g>{}<>\" doesn't exists!", directory );
 
         return directory;
+
+    @staticmethod
+    def GetSteamInstallation() -> str:
+    #
+        '''Try getting Steam's installation path'''
+
+        from os import environ;
+
+        if "STEAM_INSTALLATION_PATH" in environ:
+        #
+            return environ[ "STEAM_INSTALLATION_PATH" ];
+        #
+
+        def TryGetPathFromInput() -> str:
+        #
+            from os import path;
+
+            UserDefinedPath: str = None;
+
+            while UserDefinedPath is None:
+            #
+                UserDefinedPath = input( "Write the absolute path to your steam installation folder.\nShould look like \"C:\Program Files (x86)\Steam\"" );
+
+                if  ( UserDefinedPath == "" ) \
+                or ( not path.isabs( UserDefinedPath ) ) \
+                or ( not path.exists( UserDefinedPath ) ) \
+                or ( not path.exists( path.join( UserDefinedPath, "steamapps" ) ) ):
+                #
+                    print( "Invalid path." );
+                    UserDefinedPath = None;
+                #
+            #
+            return UserDefinedPath;
+        #
+
+        DynamicFoundPath: str;
+
+        from platform import system;
+
+        OperativeSystem: str = system();
+
+        match OperativeSystem:
+        #
+            case "Windows":
+            #
+                from os import path;
+
+                PossiblePaths: list[str] = [
+                    path.expandvars( r"%ProgramFiles(x86)%\Steam" ),
+                    path.expandvars( r"%ProgramFiles%\Steam" )
+                ];
+
+                for pPath in PossiblePaths:
+                #
+                    if path.exists( pPath ):
+                    #
+                        return pPath;
+                    #
+                #
+
+                try:
+                #
+                    import winreg;
+
+                    with winreg.OpenKey( winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam" ) as key:
+                    #
+                        return winreg.QueryValueEx( key, "SteamPath" )[0];
+                    #
+                #
+                except( ImportError, FileNotFoundError, OSError, PermissionError ) as e:
+                #
+                    Path.m_Logger.warn( "Something went wrong: {}", e );
+                #
+
+                from subprocess import run;
+                DynamicFoundPath = TryGetPathFromInput();
+                run( [ "setx", "STEAM_PATH", DynamicFoundPath ], shell=True );
+            #
+            case _:
+            #
+                Path.m_Logger.error( "Path.GetSteamInstallation is not implemented for you operative system.\nYou can write yourself the absolute path." );
+                DynamicFoundPath = TryGetPathFromInput();
+            #
+        #
+
+        return DynamicFoundPath;
