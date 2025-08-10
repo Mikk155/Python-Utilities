@@ -156,13 +156,14 @@ class jsonc( dict ):
 
         if '$schema' in json:
         #
-            from os.path import join, dirname;
+            from os.path import dirname;
 
             SchemaPath: str = json.pop( "$schema" );
 
             if schema_validation is None and not SchemaPath.startswith( 'http' ):
             #
-                schema_validation = join( dirname( file_path ), SchemaPath );
+                from utils.Path import Path;
+                schema_validation = Path.enter( *SchemaPath.split( "/" ), CurrentDir=dirname(file_path) );
             #
         #
 
