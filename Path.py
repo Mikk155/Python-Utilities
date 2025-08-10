@@ -63,13 +63,13 @@ class Path:
         '''
 
         from os import makedirs;
-        from os.path import join, exists, isfile;
+        from os.path import join, exists, isfile, dirname;
 
         directory: str = CurrentDir if CurrentDir is not None else Path.Workspace();
 
         for arg in args:
 
-            directory = join( directory, arg );
+            directory = join( directory, arg ) if arg != '..' else dirname( directory );
 
             if not exists( directory ):
 
